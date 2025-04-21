@@ -36,6 +36,21 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "74cf4c46-72dd-4671-8ed8-36f166dd988a"
+      }
+    },
+    "owner": "ggsouza",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/74cf4c46-72dd-4671-8ed8-36f166dd988a"
     }
   }
 }

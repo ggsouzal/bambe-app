@@ -1,26 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity
+} from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function HomeScreen() {
+export default function Perfil() {
   const router = useRouter();
+
+  const nome = 'Mariana Souza';
+  const email = 'mariana@bambe.com.br';
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/logobambe.png')}
-        style={styles.logo}
-        resizeMode="contain"
+        source={require('../assets/images/150.png')}
+        style={styles.avatar}
       />
 
-      <Text style={styles.title}>CRM Bambé</Text>
-      <Text style={styles.subtitle}>Ferramenta de apoio ao colaborador Bambé</Text>
+      <Text style={styles.nome}>{nome}</Text>
+      <Text style={styles.email}>{email}</Text>
 
       <TouchableOpacity
         style={styles.botao}
-        onPress={() => router.push('LoginScreen')}
+        onPress={() => router.replace('LoginScreen')}
       >
-        <Text style={styles.textoBotao}>ENTRAR NO SISTEMA</Text>
+        <Text style={styles.textoBotao}>Sair</Text>
       </TouchableOpacity>
     </View>
   );
@@ -34,32 +42,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20
   },
-  logo: {
-    borderRadius: 90,
+  avatar: {
     width: 100,
     height: 100,
-    marginBottom: 20
+    borderRadius: 50,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#a5c9a1'
   },
-  title: {
-    fontSize: 28,
+  nome: {
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#ffffff',
     marginBottom: 5
   },
-  subtitle: {
+  email: {
     fontSize: 14,
     color: '#cccccc',
-    textAlign: 'center',
     marginBottom: 30
   },
   botao: {
-    backgroundColor: '#000',
+    backgroundColor: '#a5c9a1',
     paddingVertical: 12,
     paddingHorizontal: 30,
-    borderRadius: 10
+    borderRadius: 8
   },
   textoBotao: {
-    color: '#ffff',
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 16
   }
