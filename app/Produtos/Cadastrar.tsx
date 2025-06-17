@@ -6,17 +6,24 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Alert
+  Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { db } from '../../services/firebaseConfig';
+import { ref, push } from 'firebase/database';
+
+export const unstable_settings = {
+  headerShown: false,
+};
 
 export default function CadastrarProduto() {
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
+  const [quantidade, setQuantidade] = useState('');
   const [imagem, setImagem] = useState<string | null>(null);
 
   const tirarFoto = async () => {
@@ -30,7 +37,7 @@ export default function CadastrarProduto() {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       base64: true,
-      quality: 0.7
+      quality: 0.7,
     });
 
     if (!result.canceled) {
@@ -40,26 +47,36 @@ export default function CadastrarProduto() {
   };
 
   const salvarProduto = () => {
-    if (!nome || !descricao || !preco || !imagem) {
+    if (!nome || !descricao || !preco || !imagem || !quantidade) {
       Alert.alert('Erro', 'Preencha todos os campos e tire uma foto.');
       return;
     }
 
     const novoProduto = {
-      id: String(Date.now()),
       nome,
       descricao,
-      preco,
-      imagem
+      preco: parseFloat(preco),
+      quantidade: parseInt(quantidade),
+      imagem,
     };
 
-    const json = JSON.stringify(novoProduto);
-    navigation.navigate('Produtos/Listar', { novoProduto: json });
+    const produtosRef = ref(db, 'produtos');
+    push(produtosRef, novoProduto)
+      .then(() => {
+        Alert.alert('Sucesso', 'Produto cadastrado!');
+        router.back();
+      })
+      .catch(() => {
+        Alert.alert('Erro', 'Ocorreu um erro ao cadastrar.');
+      });
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')} style={styles.voltar}>
+      <TouchableOpacity
+        onPress={() => router.push('/HomeScreen')}
+        style={styles.voltar}
+      >
         <Text style={styles.voltarTexto}>← Voltar ao Menu</Text>
       </TouchableOpacity>
 
@@ -82,11 +99,20 @@ export default function CadastrarProduto() {
       />
 
       <TextInput
-        placeholder="Preço"
+        placeholder="Preço (Ex: 49.90)"
         placeholderTextColor="#999"
         style={styles.input}
         value={preco}
         onChangeText={setPreco}
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        placeholder="Quantidade"
+        placeholderTextColor="#999"
+        style={styles.input}
+        value={quantidade}
+        onChangeText={setQuantidade}
         keyboardType="numeric"
       />
 
@@ -104,31 +130,26 @@ export default function CadastrarProduto() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f0f0f',
-    padding: 20,
-    justifyContent: 'center'
-  },
+  container: { flex: 1, backgroundColor: '#0f0f0f', padding: 20 },
   voltar: {
     alignSelf: 'flex-start',
-    marginBottom: 20,
     backgroundColor: '#1c1c1c',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8
+    borderRadius: 8,
+    marginBottom: 20,
   },
   voltarTexto: {
     color: '#a5c9a1',
     fontSize: 14,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 22,
     color: '#fff',
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   input: {
     backgroundColor: '#1c1c1c',
@@ -137,28 +158,28 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: '#333',
     borderWidth: 1,
-    marginBottom: 15
+    marginBottom: 15,
   },
   botaoCinza: {
     backgroundColor: '#333',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 12
+    marginBottom: 12,
   },
   textoBotaoCinza: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   botaoVerde: {
     backgroundColor: '#a5c9a1',
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   textoBotaoVerde: {
     color: '#000',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   preview: {
     width: 100,
@@ -167,6 +188,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#444'
-  }
+    borderColor: '#444',
+  },
 });
