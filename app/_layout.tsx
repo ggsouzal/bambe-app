@@ -31,7 +31,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack
         screenOptions={{
-          headerShown: false, // 🔥 Remove a barra branca (cabeçalho) de todas as telas
+          headerShown: false,
         }}
       />
       <StatusBar style="auto" />

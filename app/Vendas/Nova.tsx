@@ -33,7 +33,7 @@ export default function NovaVenda() {
               id: key,
               ...data[key],
             }))
-            .filter((item) => item.quantidade > 0) // Somente produtos com estoque
+            .filter((item) => item.quantidade > 0)
         : [];
       setProdutos(lista);
     });

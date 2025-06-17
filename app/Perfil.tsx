@@ -35,7 +35,7 @@ export default function Perfil() {
 
       <View style={styles.card}>
         <Image
-          source={require('../assets/images/150.png')}
+          source={require('../assets/images/perfil.png')}
           style={styles.avatar}
         />
 

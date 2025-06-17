@@ -17,7 +17,7 @@ export default function Home() {
 
   const nome = 'Mariana Souza';
   const email = 'mariana@bambe.com.br';
-  const foto = require('../assets/images/150.png');
+  const foto = require('../assets/images/perfil.png');
 
   return (
     <View style={styles.container}>
