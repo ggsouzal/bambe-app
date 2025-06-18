@@ -1,7 +1,8 @@
+// services/firebaseConfig.ts
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
-// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyA28B4RphI8x4-Mpt-W5jyIKb3EIRe9EEo",
   authDomain: "bambe-app.firebaseapp.com",
@@ -15,5 +16,6 @@ const firebaseConfig = {
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
-// Exporta o Database
-export const db = getDatabase(app);
+// Exporta Auth e Database
+export const auth = getAuth(app);
+export const db   = getDatabase(app);

@@ -5,15 +5,25 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
-  Image
+  Image,
+  Platform,
+  Alert
 } from 'react-native';
-import { useNavigation } from 'expo-router';
 import * as Network from 'expo-network';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../services/firebaseConfig';
+import { useRouter } from 'expo-router';
+
+function showAlert(title: string, message: string) {
+  if (Platform.OS === 'web') {
+    window.alert(`${title}\n\n${message}`);
+  } else {
+    Alert.alert(title, message);
+  }
+}
 
 export default function LoginScreen() {
-  const navigation = useNavigation();
-
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -23,20 +33,44 @@ export default function LoginScreen() {
       const status = await Network.getNetworkStateAsync();
       setIsConnected(status.isConnected);
     };
-
     verificarConexao();
-
     const intervalo = setInterval(verificarConexao, 5000);
     return () => clearInterval(intervalo);
   }, []);
 
   const handleLogin = () => {
     if (!email || !senha) {
-      Alert.alert('Atenção', 'Preencha todos os campos.');
+      showAlert('Atenção', 'Preencha todos os campos.');
       return;
     }
 
-    navigation.navigate('HomeScreen');
+    signInWithEmailAndPassword(auth, email, senha)
+      .then(() => {
+        showAlert('✅ Sucesso', 'Login realizado com sucesso!');
+        router.push('/HomeScreen');
+      })
+      .catch((error) => {
+        console.log('❌ Erro no login:', error.code, error.message);
+        switch (error.code) {
+          case 'auth/invalid-email':
+            showAlert('Erro', 'Formato de e-mail inválido.');
+            break;
+          case 'auth/user-not-found':
+            showAlert('Erro', 'E-mail não cadastrado.');
+            break;
+          case 'auth/wrong-password':
+            showAlert('Erro', 'Senha incorreta. Tente novamente.');
+            break;
+          case 'auth/too-many-requests':
+            showAlert(
+              'Erro',
+              'Muitas tentativas falharam. Aguarde alguns minutos antes de tentar de novo.'
+            );
+            break;
+          default:
+            showAlert('Erro', 'Ocorreu um erro: ' + error.message);
+        }
+      });
   };
 
   return (
@@ -46,7 +80,6 @@ export default function LoginScreen() {
           <Text style={styles.textoAlerta}>Você está offline ⚠️</Text>
         </View>
       )}
-
       {isConnected === true && (
         <View style={styles.alertaConectado}>
           <Text style={styles.textoAlerta}>Conectado à internet ✅</Text>
@@ -68,6 +101,8 @@ export default function LoginScreen() {
         style={styles.input}
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
 
       <TextInput

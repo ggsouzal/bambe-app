@@ -1,30 +1,66 @@
-import React from 'react';
+// app/HomeScreen.tsx
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 
 export const unstable_settings = {
   headerShown: false,
 };
 
-export default function Home() {
+export default function HomeScreen() {
   const router = useRouter();
+  const auth = getAuth();
 
-  const nome = 'Mariana Souza';
-  const email = 'mariana@bambe.com.br';
-  const foto = require('../assets/images/perfil.png');
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Monitora o estado de autenticação
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator color="#a5c9a1" size="large" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    // Se por algum motivo não houver usuário, volta para login
+    router.replace('/LoginScreen');
+    return null;
+  }
+
+  const displayName = user.displayName || user.email?.split('@')[0];
+  const email = user.email!;
+  const photoURI =
+    user.photoURL ||
+    // fallback para imagem padrão
+    require('../assets/images/perfil.png');
 
   return (
     <View style={styles.container}>
       {/* Perfil */}
       <View style={styles.perfil}>
-        <Image source={foto} style={styles.foto} />
-        <Text style={styles.nome}>{nome}</Text>
+        <Image
+          source={typeof photoURI === 'string' ? { uri: photoURI } : photoURI}
+          style={styles.foto}
+        />
+        <Text style={styles.nome}>{displayName}</Text>
         <Text style={styles.email}>{email}</Text>
       </View>
 
@@ -73,6 +109,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0f0f0f',
     padding: 30,
+    justifyContent: 'center',
+  },
+  center: {
+    alignItems: 'center',
     justifyContent: 'center',
   },
   perfil: {
